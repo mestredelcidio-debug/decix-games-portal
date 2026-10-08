@@ -352,6 +352,7 @@ export const api = {
    * Pesquisa textual inteligente no cliente (com pontuação de relevância)
    */
   async searchGames(query: string, page = 1, limit = 24, sortBy?: string): Promise<GameListResponse> {
+    await loadGamePixGames();
     const all = getAllMergedGames();
     const q = query.trim().toLowerCase();
 
@@ -469,6 +470,7 @@ export const api = {
     },
 
     async syncGamePix(_secret: string) {
+      await loadGamePixGames();
       // No modo estático do GitHub Pages, simula a sincronização bem sucedida com o catálogo integrado
       const games = getAllMergedGames();
       return {
@@ -479,6 +481,7 @@ export const api = {
     },
 
     async toggleFeatured(gameId: string, _secret: string) {
+      await loadGamePixGames();
       const overrides = getStorageItem<Record<string, boolean>>(STORAGE_KEYS.FEATURED_OVERRIDES, {});
       const all = getAllMergedGames();
       const target = all.find((g) => g.id === gameId);
