@@ -154,7 +154,8 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({ game, onBackToCatalog })
               title={game.title}
               className="w-full h-full border-0"
               allow="autoplay; fullscreen; accelerometer; gyroscope; screen-wake-lock"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+              sandbox={game.provider === 'GAMEPIX' ? undefined : 'allow-scripts allow-same-origin allow-popups allow-forms'}
+              referrerPolicy="no-referrer-when-downgrade"
               onLoad={() => setIsLoading(false)}
               onError={() => {
                 setIsLoading(false);
