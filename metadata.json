@@ -1,0 +1,6 @@
+{
+  "name": "DECIX GAMES",
+  "description": "Portal profissional de jogos HTML5 com foco em raciocínio, lógica, quebra-cabeças e inteligência.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
