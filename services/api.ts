@@ -5,8 +5,8 @@
  */
 
 import { DecixGame, GameCategory, GameListResponse, SystemStats } from '../types/game.js';
-import { INITIAL_GAMES } from '../../server/data/initialGames.js';
-import { INITIAL_CATEGORIES } from '../../server/data/categories.js';
+import { INITIAL_GAMES } from '../server/data/initialGames.js';
+import { INITIAL_CATEGORIES } from '../server/data/categories.js';
 
 // Chaves de armazenamento no LocalStorage
 const STORAGE_KEYS = {
