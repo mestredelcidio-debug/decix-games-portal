@@ -1,4 +1,4 @@
-const GAMEPIX_FEED = 'https://feeds.gamepix.com/v2/json?sid=902E1&pagination=12&page=';
+const GAMEPIX_FEED = 'https://feeds.gamepix.com/v2/json?sid=X874C&pagination=12&page=';
 const CACHE_TTL = 10 * 60;
 
 function toStringValue(value, fallback = '') {
