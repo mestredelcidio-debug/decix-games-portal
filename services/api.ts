@@ -41,12 +41,40 @@ function setStorageItem<T>(key: string, value: T): void {
 /**
  * Retorna todos os jogos unificados (iniciais + customizados do admin + contagem de jogadas + overrides de destaque)
  */
+let remoteGamePixGames: DecixGame[] = [];
+let gamePixLoadPromise: Promise<void> | null = null;
+
+async function loadGamePixGames(): Promise<void> {
+  if (gamePixLoadPromise) return gamePixLoadPromise;
+
+  gamePixLoadPromise = (async () => {
+    try {
+      const response = await fetch('/api/gamepix?page=1&limit=120', {
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json() as { games?: DecixGame[] };
+      if (Array.isArray(payload.games)) {
+        remoteGamePixGames = payload.games.filter((g) => g && g.id && g.gameUrl);
+      }
+    } catch (error) {
+      console.warn('[DECIX GamePix] Não foi possível carregar o catálogo remoto. Usando catálogo local.', error);
+      remoteGamePixGames = [];
+    }
+  })();
+
+  return gamePixLoadPromise;
+}
+
 function getAllMergedGames(): DecixGame[] {
   const customGames = getStorageItem<DecixGame[]>(STORAGE_KEYS.CUSTOM_GAMES, []);
   const featuredOverrides = getStorageItem<Record<string, boolean>>(STORAGE_KEYS.FEATURED_OVERRIDES, {});
   const playCounts = getStorageItem<Record<string, number>>(STORAGE_KEYS.PLAY_COUNTS, {});
 
-  const baseGames = [...INITIAL_GAMES, ...customGames];
+  const remoteById = new Map(remoteGamePixGames.map((game) => [game.id, game]));
+  const localBaseGames = [...INITIAL_GAMES, ...customGames];
+  const localIds = new Set(localBaseGames.map((game) => game.id));
+  const baseGames = [...localBaseGames, ...remoteGamePixGames.filter((game) => !localIds.has(game.id))];
 
   return baseGames.map((game) => {
     const overrideFeatured = featuredOverrides[game.id];
@@ -63,7 +91,7 @@ function getAllMergedGames(): DecixGame[] {
 /**
  * Retorna todas as categorias com contagens calculadas dinamicamente
  */
-function getAllMergedCategories(): GameCategory[] {
+async function getAllMergedCategories(): Promise<GameCategory[]> {
   const customCats = getStorageItem<GameCategory[]>(STORAGE_KEYS.CUSTOM_CATEGORIES, []);
   const allCats = [...INITIAL_CATEGORIES, ...customCats];
   const allGames = getAllMergedGames();
@@ -93,6 +121,7 @@ export const api = {
     sortBy?: 'popular' | 'new' | 'az' | 'rating';
     search?: string;
   } = {}): Promise<GameListResponse> {
+    await loadGamePixGames();
     let list = getAllMergedGames();
 
     // 1. Filtro por categoria
@@ -163,6 +192,7 @@ export const api = {
    * Busca jogos mais populares
    */
   async getPopularGames(limit = 12): Promise<DecixGame[]> {
+    await loadGamePixGames();
     const list = getAllMergedGames();
     return list
       .sort((a, b) => {
@@ -204,6 +234,7 @@ export const api = {
    * Busca detalhes de um jogo por slug ou id
    */
   async getGameBySlug(slug: string): Promise<{ game: DecixGame; related: DecixGame[] } | null> {
+    await loadGamePixGames();
     const all = getAllMergedGames();
     const game = all.find((g) => g.slug === slug || g.id === slug);
     if (!game) return null;
@@ -220,6 +251,7 @@ export const api = {
    * Busca categorias de jogos
    */
   async getCategories(): Promise<GameCategory[]> {
+    await loadGamePixGames();
     return getAllMergedCategories();
   },
 
@@ -290,12 +322,13 @@ export const api = {
    * Busca resumo e destaques de uma categoria
    */
   async getCategorySummary(slug: string) {
+    await loadGamePixGames();
     const all = getAllMergedGames();
     const catGames = all.filter(
       (g) => g.categorySlug.toLowerCase() === slug.toLowerCase() || g.category.toLowerCase() === slug.toLowerCase()
     );
     const category =
-      getAllMergedCategories().find((c) => c.slug.toLowerCase() === slug.toLowerCase()) || {
+      (await getAllMergedCategories()).find((c) => c.slug.toLowerCase() === slug.toLowerCase()) || {
         id: 'cat-' + slug,
         slug,
         name: slug.charAt(0).toUpperCase() + slug.slice(1),
@@ -394,8 +427,9 @@ export const api = {
    * Busca estatísticas calculadas diretamente do catálogo local e LocalStorage
    */
   async getStats(): Promise<SystemStats> {
+    await loadGamePixGames();
     const games = getAllMergedGames();
-    const categories = getAllMergedCategories();
+    const categories = await getAllMergedCategories();
     const playCounts = getStorageItem<Record<string, number>>(STORAGE_KEYS.PLAY_COUNTS, {});
 
     const totalRecordedPlays = Object.values(playCounts).reduce((acc, curr) => acc + curr, 0);
