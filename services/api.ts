@@ -207,6 +207,7 @@ export const api = {
    * Busca jogos novos
    */
   async getNewGames(limit = 12): Promise<DecixGame[]> {
+    await loadGamePixGames();
     const list = getAllMergedGames();
     return list
       .filter((g) => g.isNew)
@@ -218,6 +219,7 @@ export const api = {
    * Busca jogos em destaque
    */
   async getFeaturedGames(limit = 12): Promise<DecixGame[]> {
+    await loadGamePixGames();
     const list = getAllMergedGames();
     const featured = list.filter((g) => g.isFeatured);
     if (featured.length >= limit) {
