@@ -169,6 +169,25 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (url.pathname === '/ads.txt') {
+      const assetResponse = await env.ASSETS.fetch(request);
+      if (!assetResponse.ok) return assetResponse;
+      let ads = await assetResponse.text();
+      ads = ads
+        .replace('sonobi.com, 37fbaf262c, RESELLER, d1a215d529a55807', 'sonobi.com, 37fbaf262c, RESELLER, d1a215d1eb5aee9e')
+        .replace('sonobi.com, 3aed893727, REVENDEDOR, d1a215d529a55807', 'sonobi.com, 3aed893727, REVENDEDOR, d1a215d1eb5aee9e')
+        .replace('sonobi.com, 7f5fa520f8, REVENDEDOR, d1a215d529a55807', 'sonobi.com, 7f5fa520f8, REVENDEDOR, d1a215d9eb5aee9e')
+        .replace('sonobi.com, 4a289cdd79, REVENDEDOR, d1a215d529a55807', 'sonobi.com, 4a289cdd79, REVENDEDOR, d1a215d9eb5aee9e')
+        .replace('sonobi.com, 77d89ec7c4, DIRETO, d1a215d529a55807', 'sonobi.com, 77d89ec7c4, DIRETO, d1a215d9eb5aee9e')
+        .replace('sonobi.com, 296bf9795d, DIRETO, d1a215d529a55807', 'sonobi.com, 296bf9795d, DIRETO, d1a215d9eb5aee9e');
+      return new Response(ads, {
+        headers: {
+          'content-type': 'text/plain; charset=utf-8',
+          'cache-control': 'public, max-age=300'
+        }
+      });
+    }
+
     if (url.pathname === '/api/gamepix') {
       try {
         return await getGamePixGames(request);
