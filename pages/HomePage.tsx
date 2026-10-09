@@ -5,7 +5,6 @@ import { api } from '../services/api.js';
 import { GameCard } from '../components/common/GameCard.js';
 import { CategoryCard } from '../components/common/CategoryCard.js';
 import { SkeletonCard } from '../components/common/SkeletonCard.js';
-import { AdBanner } from '../components/ads/AdBanner.js';
 import { useHistory } from '../hooks/useHistory.js';
 import { useSeo } from '../hooks/useSeo.js';
 
@@ -70,13 +69,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPlayGame, onNavigate }) =>
   const heroGame = featuredGames[0] || popularGames[0];
 
   return (
-    <div className="w-full space-y-12 pb-20">
-      {/* Top Banner Ad slot */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <AdBanner position="top" />
-      </div>
-
-      {/* 1. HERO SECTION (DESTAQUE PRINCIPAL) */}
+    <div className="w-full space-y-12 pb-20">{/* 1. HERO SECTION (DESTAQUE PRINCIPAL) */}
       {heroGame && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-r from-gray-950 via-gray-900 to-cyan-950/40 p-6 sm:p-10 lg:p-12 shadow-[0_0_50px_-15px_rgba(6,182,212,0.25)]">
@@ -342,12 +335,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onPlayGame, onNavigate }) =>
             />
           ))}
         </div>
-      </section>
-
-      {/* Bottom Ad slot */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <AdBanner position="bottom" />
-      </div>
-    </div>
+      </section></div>
   );
 };
