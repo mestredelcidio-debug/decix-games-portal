@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/common/Header.js';
 import { Footer } from './components/common/Footer.js';
+import { AdBanner } from './components/ads/AdBanner.js';
 import { HomePage } from './pages/HomePage.js';
 import { CatalogPage } from './pages/CatalogPage.js';
 import { GameDetailPage } from './pages/GameDetailPage.js';
@@ -164,9 +165,11 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
       <Header currentPath={currentPath} onNavigate={navigate} onOpenSearch={() => navigate('/pesquisa')} />
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2"><AdBanner position="top" slotId="decix-ad-top" /></div>
       <main className="flex-1 w-full">
         {renderContent()}
       </main>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-2"><AdBanner position="bottom" slotId="decix-ad-footer" /></div>
       <Footer onNavigate={navigate} />
     </div>
   );
